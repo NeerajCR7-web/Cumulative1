@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Cumulative1.Models.Student>
+
+<div class="container mt-5 bg-light p-4 rounded shadow-lg">
+    <h2 class="text-center text-primary mb-5">Student List</h2>
+
+    <!-- Student Cards -->
+    <div class="row">
+        @foreach (Cumulative1.Models.Student CurrentStudent in Model)
+        {
+            <div class="col-md-4 col-sm-6 mb-4">
+                <!-- Student Card -->
+                <div class="card shadow-lg rounded-lg border-0 h-100">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <a href="/StudentPage/Show/@CurrentStudent.StudentId" class="stretched-link text-decoration-none">
+                            <h5 class="card-title text-center text-dark mb-0">
+                                @CurrentStudent.StudentFName @CurrentStudent.StudentLName
+                            </h5>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
