@@ -1,5 +1,5 @@
-using Cumulative1.Models;
 using Microsoft.AspNetCore.Mvc;
+using Cumulative1.Models;
 using System.Diagnostics;
 
 namespace Cumulative1.Controllers

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using Cumulative1.Models;
+
 namespace Cumulative1.Controllers
 {
     [Route("api/Course")]
@@ -9,114 +10,126 @@ namespace Cumulative1.Controllers
     {
         private readonly SchoolDbContext _context;
 
-        // Dependency injection of school database context
         public CourseAPIController(SchoolDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Returns a list of Courses in the system
+        /// Retrieves all courses.
         /// </summary>
-        /// <example>
-        /// GET api/Course/ListCourses -> [{"courseId":1,"courseCode":"http5101","teacherId":1,"startDate":"2018-09-04","finishDate":"2018-12-14","courseName":"Web Application Development"},{"courseId":2,"courseCode":"http5102","teacherId":2,"startDate":"2018-09-04","finishDate":"2018-12-14","courseName":"Project Management"},{"courseId":3,"courseCode":"http5103","teacherId":5,"startDate":"2018-09-04","finishDate":"2018-12-14","courseName":"Web Programming"},..]
-        /// </example>
-        /// <returns>
-        /// A list of course objects 
-        /// </returns>
-        [HttpGet]
-        [Route(template: "ListCourses")]
-        public List<Course> ListCourses()
+        /// <returns>A list of all courses in the database.</returns>
+        [HttpGet("ListCourses")]
+        public IActionResult ListCourses()
         {
-            // Create an empty list of Courses
-            List<Course> Courses = new List<Course>();
+            var courses = new List<Course>();
 
-            // 'using' will close the connection after the code executes
-            using (MySqlConnection Connection = _context.AccessDatabase())
+            using (var connection = _context.AccessDatabase())
             {
-                // Open the connection
-                Connection.Open();
-
-                // Establish a new command (query) for our database
-                MySqlCommand Command = Connection.CreateCommand();
-
-                // Set the SQL Command
-                Command.CommandText = "SELECT * FROM courses";
-
-                // Gather Result Set of Query into a variable
-                using (MySqlDataReader ResultSet = Command.ExecuteReader())
+                connection.Open();
+                var command = new MySqlCommand("SELECT * FROM courses", connection);
+                using (var resultSet = command.ExecuteReader())
                 {
-                    // Loop Through Each Row of the Result Set
-                    while (ResultSet.Read())
+                    while (resultSet.Read())
                     {
-                        Course CurrentCourse = new Course();
-                        // Access Column information by the DB column name as an index
-                        CurrentCourse.CourseId = Convert.ToInt32(ResultSet["courseid"]);
-                        CurrentCourse.CourseCode = (ResultSet["coursecode"]).ToString();
-                        CurrentCourse.TeacherId = Convert.ToInt32(ResultSet["teacherid"]);
-                        CurrentCourse.StartDate = Convert.ToDateTime(ResultSet["startdate"]).ToString("yyyy-MM-dd");
-                        CurrentCourse.FinishDate = Convert.ToDateTime(ResultSet["finishdate"]).ToString("yyyy-MM-dd");
-                        CurrentCourse.CourseName = (ResultSet["coursename"]).ToString();
-                        // Add it to the Courses list
-                        Courses.Add(CurrentCourse);
+                        courses.Add(new Course
+                        {
+                            CourseId = Convert.ToInt32(resultSet["courseid"]),
+                            CourseCode = resultSet["coursecode"].ToString(),
+                            TeacherId = Convert.ToInt32(resultSet["teacherid"]),
+                            StartDate = Convert.ToDateTime(resultSet["startdate"]).ToString("yyyy-MM-dd"),
+                            FinishDate = Convert.ToDateTime(resultSet["finishdate"]).ToString("yyyy-MM-dd"),
+                            CourseName = resultSet["coursename"].ToString()
+                        });
                     }
                 }
             }
 
-            // Return the final list of courses
-            return Courses;
+            return Ok(courses);
         }
 
         /// <summary>
-        /// Returns a course in the database by their ID
+        /// Retrieves a course by its ID.
         /// </summary>
-        /// <param name="id">It accepts an id which is an integer</param>
-        /// <example>
-        /// GET api/Course/FindCourse/7 -> {"courseId":7,"courseCode":"http5202","teacherId":3,"startDate":"2019-01-08","finishDate":"2019-04-27","courseName":"Web Application Development 2"}
-        /// </example>
-        /// <returns>
-        /// A matching course object by its ID. Empty object if course not found
-        /// </returns>
-        [HttpGet]
-        [Route(template: "FindCourse/{id}")]
-        public Course FindCourse(int id)
+        /// <param name="id">Course ID</param>
+        /// <returns>The course details if found; otherwise, a not found response.</returns>
+        [HttpGet("FindCourse/{id}")]
+        public IActionResult FindCourse(int id)
         {
-            // Empty Course
-            Course SelectedCourse = new Course();
+            Course course = null;
 
-            // 'using' will close the connection after the code executes
-            using (MySqlConnection Connection = _context.AccessDatabase())
+            using (var connection = _context.AccessDatabase())
             {
-                // Open the connection
-                Connection.Open();
-
-                // Establish a new command (query) for our database
-                MySqlCommand Command = Connection.CreateCommand();
-
-                // Set the SQL Command
-                Command.CommandText = "SELECT * FROM courses WHERE courseid=@id";
-                Command.Parameters.AddWithValue("@id", id);
-
-                // Gather Result Set of Query into a variable
-                using (MySqlDataReader ResultSet = Command.ExecuteReader())
+                connection.Open();
+                var command = new MySqlCommand("SELECT * FROM courses WHERE courseid=@id", connection);
+                command.Parameters.AddWithValue("@id", id);
+                using (var resultSet = command.ExecuteReader())
                 {
-                    // Loop Through Each Row of the Result Set
-                    while (ResultSet.Read())
+                    if (resultSet.Read())
                     {
-                        // Access Column information by the DB column name as an index
-                        SelectedCourse.CourseId = Convert.ToInt32(ResultSet["courseid"]);
-                        SelectedCourse.CourseCode = (ResultSet["coursecode"]).ToString();
-                        SelectedCourse.TeacherId = Convert.ToInt32(ResultSet["teacherid"]);
-                        SelectedCourse.StartDate = Convert.ToDateTime(ResultSet["startdate"]).ToString("yyyy-MM-dd");
-                        SelectedCourse.FinishDate = Convert.ToDateTime(ResultSet["finishdate"]).ToString("yyyy-MM-dd");
-                        SelectedCourse.CourseName = (ResultSet["coursename"]).ToString();
-
+                        course = new Course
+                        {
+                            CourseId = Convert.ToInt32(resultSet["courseid"]),
+                            CourseCode = resultSet["coursecode"].ToString(),
+                            TeacherId = Convert.ToInt32(resultSet["teacherid"]),
+                            StartDate = Convert.ToDateTime(resultSet["startdate"]).ToString("yyyy-MM-dd"),
+                            FinishDate = Convert.ToDateTime(resultSet["finishdate"]).ToString("yyyy-MM-dd"),
+                            CourseName = resultSet["coursename"].ToString()
+                        };
                     }
                 }
             }
 
-            // Return the final list of course names
-            return SelectedCourse;
+            if (course == null)
+                return NotFound($"Course with ID {id} not found.");
+            return Ok(course);
+        }
+
+        /// <summary>
+        /// Adds a new course.
+        /// </summary>
+        /// <param name="course">Course data</param>
+        /// <returns>The ID of the newly created course.</returns>
+        [HttpPost("AddCourse")]
+        public IActionResult AddCourse([FromBody] Course course)
+        {
+            using (var connection = _context.AccessDatabase())
+            {
+                connection.Open();
+                var command = new MySqlCommand(
+                    "INSERT INTO courses(coursecode,teacherid,startdate,finishdate,coursename) VALUES(@coursecode,@teacherid,@startdate,@finishdate,@coursename)",
+                    connection);
+                command.Parameters.AddWithValue("@coursecode", course.CourseCode);
+                command.Parameters.AddWithValue("@teacherid", course.TeacherId);
+                command.Parameters.AddWithValue("@startdate", course.StartDate);
+                command.Parameters.AddWithValue("@finishdate", course.FinishDate);
+                command.Parameters.AddWithValue("@coursename", course.CourseName);
+                command.ExecuteNonQuery();
+
+                return CreatedAtAction(nameof(FindCourse), new { id = command.LastInsertedId }, course);
+            }
+        }
+
+        /// <summary>
+        /// Deletes a course by ID.
+        /// </summary>
+        /// <param name="id">Course ID</param>
+        /// <returns>A message indicating success or failure.</returns>
+        [HttpDelete("DeleteCourse/{id}")]
+        public IActionResult DeleteCourse(int id)
+        {
+            int rowsAffected;
+            using (var connection = _context.AccessDatabase())
+            {
+                connection.Open();
+                var command = new MySqlCommand("DELETE FROM courses WHERE courseid=@id", connection);
+                command.Parameters.AddWithValue("@id", id);
+                rowsAffected = command.ExecuteNonQuery();
+            }
+
+            if (rowsAffected > 0)
+                return Ok($"Course with ID {id} has been deleted.");
+            return NotFound($"Course with ID {id} not found.");
         }
     }
 }

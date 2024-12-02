@@ -59,7 +59,7 @@ namespace Cumulative1.Controllers
                         CurrentTeacher.TeacherFName = ResultSet["teacherfname"].ToString();
                         CurrentTeacher.TeacherLName = ResultSet["teacherlname"].ToString();
                         CurrentTeacher.EmployeeNumber = ResultSet["employeenumber"].ToString();
-                        CurrentTeacher.HireDate = Convert.ToDateTime(ResultSet["hiredate"]).ToString("yyyy/MM/dd HH:mm:ss");
+                        CurrentTeacher.HireDate = ResultSet["hiredate"] != DBNull.Value ? Convert.ToDateTime(ResultSet["hiredate"]).ToString("yyyy/MM/dd HH:mm:ss") : "";
                         CurrentTeacher.Salary = Convert.ToDecimal(ResultSet["salary"]);
                         foreach (Course CourseDetails in ListCourses())
                         {
@@ -163,7 +163,7 @@ namespace Cumulative1.Controllers
                 // Create command
                 MySqlCommand Command = Connection.CreateCommand();
 
-                //  Set the SQL Command
+                // Set the SQL Command
                 Command.CommandText = "SELECT * FROM teachers WHERE teacherid=@id";
                 Command.Parameters.AddWithValue("@id", id);
 
@@ -178,7 +178,7 @@ namespace Cumulative1.Controllers
                         SelectedTeacher.TeacherFName = ResultSet["teacherfname"].ToString();
                         SelectedTeacher.TeacherLName = ResultSet["teacherlname"].ToString();
                         SelectedTeacher.EmployeeNumber = ResultSet["employeenumber"].ToString();
-                        SelectedTeacher.HireDate = Convert.ToDateTime(ResultSet["hiredate"]).ToString("yyyy/MM/dd HH:mm:ss");
+                        SelectedTeacher.HireDate = ResultSet["hiredate"] != DBNull.Value ? Convert.ToDateTime(ResultSet["hiredate"]).ToString("yyyy/MM/dd HH:mm:ss") : "";
                         SelectedTeacher.Salary = Convert.ToDecimal(ResultSet["salary"]);
                         foreach (Course CourseDetails in ListCourses())
                         {
@@ -200,6 +200,107 @@ namespace Cumulative1.Controllers
         }
 
 
+        /// curl -X "POST" -H "Content-Type: application/json" -d "{\"teacherFName\": \"Robert\", \"teacherLName\": \"Smith\", \"employeeNumber\": \"T102\", \"hireDate\": \"2024-11-22 00:00:00\", \"salary\": 55.25}" "https://localhost:7151/api/Teacher/AddTeacher"
+
+        /// <summary>
+        /// Adds a teacher to the database
+        /// </summary>
+        /// <param name="TeacherData">Teacher Object</param>
+        /// <example>
+        /// POST: api/Teacher/AddTeacher
+        /// Headers: Content-Type: application/json
+        /// Request Body:
+        /// {
+        /// "TeacherFname": "Robert",
+        /// "TeacherLname": "Smith",  
+        /// "EmployeeNumber": "T102",
+        /// "HireDate": "2019-09-04",
+        /// "Salary": 55.25,
+        /// } -> 25
+        /// </example>
+        /// <returns>
+        /// The inserted Teacher Id from the database if successful. 0 if Unsuccessful
+        /// </returns>
+
+        [HttpPost(template: "AddTeacher")]
+        public int AddTeacher([FromBody] Teacher TeacherData)
+
+        {
+            // 'using' will close the connection after the code executes
+            using (MySqlConnection Connection = _context.AccessDatabase())
+            {
+                // Open the connection
+                Connection.Open();
+
+                // Establish a new command (query) for our database
+                MySqlCommand Command = Connection.CreateCommand();
+
+                // Set the SQL Command
+                Command.CommandText = "INSERT INTO teachers (teacherfname,teacherlname,employeenumber,hiredate,salary) VALUES (@teacherfname,@teacherlname,@employeenumber,@hiredate,@salary)";
+                Command.Parameters.AddWithValue("@teacherfname", TeacherData.TeacherFName);
+                Command.Parameters.AddWithValue("@teacherlname", TeacherData.TeacherLName);
+                Command.Parameters.AddWithValue("@employeenumber", TeacherData.EmployeeNumber);
+                Command.Parameters.AddWithValue("@hiredate", TeacherData.HireDate);
+                Command.Parameters.AddWithValue("@salary", TeacherData.Salary);
+
+
+                Command.ExecuteNonQuery();
+
+
+                // Send the last inserted id of the data created
+                return Convert.ToInt32(Command.LastInsertedId);
+            }
+
+            // if failure
+            return 0;
+        }
+
+        /// curl -X "DELETE" "https://localhost:7151/api/Teacher/DeleteTeacher/20"
+
+        /// <summary>
+        /// Deletes a Teacher from the database
+        /// </summary>
+        /// <param name="TeacherId">Primary key of the teacher to delete</param>
+        /// <example>
+        /// DELETE: api/Teacher/DeleteTeacher/{TeacherId} -> "The teacher with given id {TeacherId} has been removed from the DB"
+        /// </example>
+        /// <returns>
+        /// It returns the string "The teacher with given id {teacherid} has been removed from the DB" if the teacher id is found in DB, otherwise it returns the string "The teacher with given id {teacherid} is not found"
+        /// </returns>
+
+        [HttpDelete(template: "DeleteTeacher/{TeacherId}")]
+        public string DeleteTeacher(int TeacherId)
+        {
+            // initialize the variable to track the rows affected
+            int RowsAffected = 0;
+
+            // 'using' will close the connection after the code executes
+            using (MySqlConnection Connection = _context.AccessDatabase())
+            {
+                // Open the connection
+                Connection.Open();
+
+                // Establish a new command (query) for our database
+                MySqlCommand Command = Connection.CreateCommand();
+
+                // Set the SQL Command
+                Command.CommandText = "DELETE FROM teachers WHERE teacherid=@id";
+                Command.Parameters.AddWithValue("@id", TeacherId);
+
+                RowsAffected = Command.ExecuteNonQuery();
+
+            }
+            // Check for the deletion
+            if (RowsAffected > 0)
+            {
+                return $"The teacher with given id {TeacherId} has been removed from the DB";
+            }
+            else
+            {
+                return $"The teacher with given id {TeacherId} is not found";
+            }
+
+        }
 
 
     }

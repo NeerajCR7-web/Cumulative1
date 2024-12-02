@@ -1,9 +1,8 @@
-﻿@model Cumulative1.Models.Teacher
-
-<div class="container shadow-lg p-4 mt-4 bg-light rounded">
+﻿<div class="container shadow-lg p-4 mt-4 bg-light rounded">
 
     @if (Model.TeacherId > 0)
     {
+
         <!-- Teacher Name -->
         <h4 class="text-center mb-4 text-primary">Teacher Name: @Model.TeacherFName @Model.TeacherLName</h4>
 
@@ -27,6 +26,16 @@
                 <li class="list-group-item text-center">@course.CourseName</li>
             }
         </ul>
+
+        <!-- Button Section at the Bottom -->
+        <div class="row justify-content-between mt-5">
+            <div class="col-3 text-start">
+                <a href="/TeacherPage/List" class="btn btn-secondary btn-lg w-100">Back to Teachers</a>
+            </div>
+            <div class="col-3 text-end">
+                <a href="/TeacherPage/DeleteConfirm/@Model.TeacherId" class="btn btn-danger btn-lg w-100">Delete Teacher</a>
+            </div>
+        </div>
     }
     else
     {

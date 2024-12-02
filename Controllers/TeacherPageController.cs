@@ -1,6 +1,9 @@
-﻿using Cumulative1.Controllers;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using Cumulative1.Controllers;
 using Cumulative1.Models;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Cumulative1.Controllers
 {
@@ -63,6 +66,101 @@ namespace Cumulative1.Controllers
 
         }
 
+        // GET: TeacherPage/New
+        [HttpGet]
+        public IActionResult New(int id)
+        {
+            return View();
+        }
+
+        // GET: TeacherPage/Validation
+        [HttpGet]
+        public IActionResult Validation()
+        {
+
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+            }
+            return View();
+        }
+
+        // POST: TeacherPage/Create
+        [HttpPost]
+        public IActionResult Create(Teacher NewTeacher)
+        {
+
+            string EmployeeNumberPattern = @"^T\d{3}$";
+
+            // Check for the employee number pattern
+            if (!string.IsNullOrEmpty(NewTeacher.EmployeeNumber) && !Regex.IsMatch(NewTeacher.EmployeeNumber, EmployeeNumberPattern))
+            {
+                TempData["ErrorMessage"] = "Employee number should start with 'T' followed by 3 digits. Eg: T123";
+                return RedirectToAction("Validation");
+            }
+            // Check for the employee number which exist already
+            if (!string.IsNullOrEmpty(NewTeacher.EmployeeNumber) && Regex.IsMatch(NewTeacher.EmployeeNumber, EmployeeNumberPattern))
+            {
+                List<Teacher> Teachers = _api.ListTeachers();
+                foreach (Teacher CurrentTeacher in Teachers)
+                {
+                    if (CurrentTeacher.EmployeeNumber == NewTeacher.EmployeeNumber)
+                    {
+                        TempData["ErrorMessage"] = "This employee number has already been taken by the teacher";
+                        return RedirectToAction("Validation");
+                    }
+                }
+            }
+            // Check for future hire date
+            if (!string.IsNullOrEmpty(NewTeacher.HireDate) && DateTime.Parse(NewTeacher.HireDate) > DateTime.Now)
+            {
+                TempData["ErrorMessage"] = "Hire Date cannot be in future.";
+                return RedirectToAction("Validation");
+            }
+            // Check for teacher name field from the input and respond with appropriate error message
+            if (string.IsNullOrEmpty(NewTeacher.TeacherFName) && string.IsNullOrEmpty(NewTeacher.TeacherLName))
+            {
+                TempData["ErrorMessage"] = "Teacher first and last name cannot be empty";
+                return RedirectToAction("Validation");
+            }
+            else if (string.IsNullOrEmpty(NewTeacher.TeacherFName))
+            {
+                TempData["ErrorMessage"] = "Teacher first name cannot be empty";
+                return RedirectToAction("Validation");
+            }
+            else if (string.IsNullOrEmpty(NewTeacher.TeacherLName))
+            {
+                TempData["ErrorMessage"] = "Teacher last name cannot be empty";
+                return RedirectToAction("Validation");
+            }
+            else
+            {
+                int TeacherId = _api.AddTeacher(NewTeacher);
+
+                // redirects to "Show" action on "Teacher" cotroller with id parameter supplied
+                return RedirectToAction("Show", new { id = TeacherId });
+            }
+
+
+        }
+
+        // GET : TeacherPage/DeleteConfirm/{id}
+        [HttpGet]
+        public IActionResult DeleteConfirm(int id)
+        {
+            Teacher SelectedTeacher = _api.FindTeacher(id);
+            return View(SelectedTeacher);
+        }
+
+        // POST: TeacherPage/Delete/{id}
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            string RowsAffected = _api.DeleteTeacher(id);
+
+            // redirects to list action
+            return RedirectToAction("List");
+        }
+
     }
 }
-

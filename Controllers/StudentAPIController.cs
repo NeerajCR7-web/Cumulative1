@@ -17,107 +17,134 @@ namespace Cumulative1.Controllers
         }
 
         /// <summary>
-        /// Returns a list of Students in the system
+        /// Retrieves a list of all students in the database.
         /// </summary>
         /// <example>
-        /// GET api/Student/ListStudents -> [{"studentId":1,"studentFName":"Sarah","studentLName":"Valdez","studentNumber":"N1678","enrolDate":"2018-06-18"},{"studentId":2,"studentFName":"Jennifer","studentLName":"Faulkner","studentNumber":"N1679","enrolDate":"2018-08-02"},{"studentId":3,"studentFName":"Austin","studentLName":"Simon","studentNumber":"N1682","enrolDate":"2018-06-14"},..]
+        /// GET api/Student/ListStudents -> [{"studentId":1,"studentFName":"Sarah","studentLName":"Valdez","studentNumber":"N1678","enrolDate":"2018-06-18"},...]
         /// </example>
-        /// <returns>
-        /// A list of student objects 
-        /// </returns>
+        /// <returns>A list of all students as objects.</returns>
         [HttpGet]
         [Route(template: "ListStudents")]
         public List<Student> ListStudents()
         {
-            // Create an empty list of Students
             List<Student> Students = new List<Student>();
 
-            // 'using' will close the connection after the code executes
             using (MySqlConnection Connection = _context.AccessDatabase())
             {
-                // Open the connection
                 Connection.Open();
-
-                // Establish a new command (query) for our database
                 MySqlCommand Command = Connection.CreateCommand();
-
-                // Set the SQL Query
                 Command.CommandText = "SELECT * FROM students";
 
-                // Gather Result Set of Query into a variable
                 using (MySqlDataReader ResultSet = Command.ExecuteReader())
                 {
-                    // Loop Through Each Row of the Result Set
                     while (ResultSet.Read())
                     {
-                        Student CurrentStudent = new Student();
-                        // Access Column information by the DB column name as an index
-                        CurrentStudent.StudentId = Convert.ToInt32(ResultSet["studentid"]);
-                        CurrentStudent.StudentFName = (ResultSet["studentfname"]).ToString();
-                        CurrentStudent.StudentLName = (ResultSet["studentlname"]).ToString();
-                        CurrentStudent.StudentNumber = (ResultSet["studentnumber"]).ToString();
-                        CurrentStudent.EnrolDate = Convert.ToDateTime(ResultSet["enroldate"]).ToString("yyyy-MM-dd");
-                        // Add it to the Students list
+                        Student CurrentStudent = new Student
+                        {
+                            StudentId = Convert.ToInt32(ResultSet["studentid"]),
+                            StudentFName = (ResultSet["studentfname"]).ToString(),
+                            StudentLName = (ResultSet["studentlname"]).ToString(),
+                            StudentNumber = (ResultSet["studentnumber"]).ToString(),
+                            EnrolDate = ResultSet["enroldate"] != DBNull.Value ? Convert.ToDateTime(ResultSet["enroldate"]).ToString("yyyy/MM/dd") : ""
+                        };
                         Students.Add(CurrentStudent);
                     }
                 }
             }
-            // Return the final list of students
             return Students;
         }
 
-
         /// <summary>
-        /// Returns a student in the database by their ID
+        /// Finds and retrieves a student from the database by their ID.
         /// </summary>
-        /// <param name="id">It accepts an id which is an integer</param>
+        /// <param name="id">The ID of the student to retrieve.</param>
         /// <example>
         /// GET api/Student/FindStudent/7 -> {"studentId":7,"studentFName":"Jason","studentLName":"Freeman","studentNumber":"N1694","enrolDate":"2018-08-16"}
         /// </example>
-        /// <returns>
-        /// A matching student object by its ID. Empty object if Student not found
-        /// </returns>
+        /// <returns>The matching student object, or an empty object if no match is found.</returns>
         [HttpGet]
         [Route(template: "FindStudent/{id}")]
         public Student FindStudent(int id)
         {
-            //Empty Student
             Student SelectedStudent = new Student();
 
-            // 'using' will close the connection after the code executes
             using (MySqlConnection Connection = _context.AccessDatabase())
             {
-                // Open the connection
                 Connection.Open();
-
-                // Establish a new command (query) for our database
                 MySqlCommand Command = Connection.CreateCommand();
-
-                // Set the SQL Query
                 Command.CommandText = "SELECT * FROM students WHERE studentid=@id";
                 Command.Parameters.AddWithValue("@id", id);
 
-                // Gather Result Set of Query into a variable
                 using (MySqlDataReader ResultSet = Command.ExecuteReader())
                 {
-                    // Loop Through Each Row of the Result Set
                     while (ResultSet.Read())
                     {
-                        // Access Column information by the DB column name as an index
                         SelectedStudent.StudentId = Convert.ToInt32(ResultSet["studentid"]);
                         SelectedStudent.StudentFName = (ResultSet["studentfname"]).ToString();
                         SelectedStudent.StudentLName = (ResultSet["studentlname"]).ToString();
                         SelectedStudent.StudentNumber = (ResultSet["studentnumber"]).ToString();
-                        SelectedStudent.EnrolDate = Convert.ToDateTime(ResultSet["enroldate"]).ToString("yyyy-MM-dd");
-
-
+                        SelectedStudent.EnrolDate = ResultSet["enroldate"] != DBNull.Value ? Convert.ToDateTime(ResultSet["enroldate"]).ToString("yyyy/MM/dd") : "";
                     }
                 }
             }
-            // Return the final list of student names
             return SelectedStudent;
         }
 
+        /// <summary>
+        /// Adds a new student to the database.
+        /// </summary>
+        /// <param name="StudentData">The student object to be added.</param>
+        /// <example>
+        /// POST api/Student/AddStudent -> 25 (ID of the newly added student).
+        /// </example>
+        /// <returns>The ID of the inserted student, or 0 if the operation fails.</returns>
+        [HttpPost(template: "AddStudent")]
+        public int AddStudent([FromBody] Student StudentData)
+        {
+            using (MySqlConnection Connection = _context.AccessDatabase())
+            {
+                Connection.Open();
+                MySqlCommand Command = Connection.CreateCommand();
+                Command.CommandText = "INSERT INTO students (studentfname,studentlname,studentnumber,enroldate) VALUES (@studentfname,@studentlname,@studentnumber,@enroldate)";
 
+                Command.Parameters.AddWithValue("@studentfname", StudentData.StudentFName);
+                Command.Parameters.AddWithValue("@studentlname", StudentData.StudentLName);
+                Command.Parameters.AddWithValue("@studentnumber", StudentData.StudentNumber);
+                Command.Parameters.AddWithValue("@enroldate", StudentData.EnrolDate);
+
+                Command.ExecuteNonQuery();
+
+                return Convert.ToInt32(Command.LastInsertedId);
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Deletes a student from the database by their ID.
+        /// </summary>
+        /// <param name="StudentId">The ID of the student to delete.</param>
+        /// <example>
+        /// DELETE api/Student/DeleteStudent/33 -> "The student with given id 33 has been removed from the DB".
+        /// </example>
+        /// <returns>A message indicating success or failure of the deletion.</returns>
+        [HttpDelete(template: "DeleteStudent/{StudentId}")]
+        public string DeleteStudent(int StudentId)
+        {
+            int RowsAffected = 0;
+
+            using (MySqlConnection Connection = _context.AccessDatabase())
+            {
+                Connection.Open();
+                MySqlCommand Command = Connection.CreateCommand();
+                Command.CommandText = "DELETE FROM students WHERE studentid=@id";
+                Command.Parameters.AddWithValue("@id", StudentId);
+
+                RowsAffected = Command.ExecuteNonQuery();
+            }
+
+            return RowsAffected > 0
+                ? $"The student with given id {StudentId} has been removed from the DB"
+                : $"The student with given id {StudentId} is not found";
+        }
     }
 }
