@@ -3,10 +3,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - School</title>
+    <title>@ViewData["Title"] - Cumulative1</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Cumulative1.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SchoolDatabase.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
@@ -36,6 +36,15 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="StudentPage" asp-action="List">Student</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TeacherAjaxPage" asp-action="New">Teacher (AJAX)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="CourseAjaxPage" asp-action="New">Course (AJAX)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="StudentAjaxPage" asp-action="New">Student (AJAX)</a>
                         </li>
                     </ul>
                 </div>

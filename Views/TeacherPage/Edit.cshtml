@@ -1,0 +1,133 @@
+﻿@model Cumulative1.Models.Teacher
+
+@if (Model.TeacherId > 0)
+{
+    <h1 class="text-center mb-4">Edit Teacher Details</h1>
+
+    <!-- Back to teachers -->
+    <nav class="mb-4">
+        <a class="nav-link" href="/TeacherPage/List">Back To Teachers</a>
+    </nav>
+
+    <!-- Edit Teacher Form-->
+    <form id="teacher-form" method="POST" action="/TeacherPage/Update/@Model.TeacherId" class="container shadow-lg p-5 m-4 bg-light rounded">
+        <!-- Teacher first name-->
+        <div class="mb-3">
+            <label for="TeacherFname" class="form-label">First Name</label>
+            <input type="text" name="TeacherFname" id="TeacherFname" class="form-control" value="@Model.TeacherFName" />
+            <div id="fname-error"></div>
+        </div>
+
+        <!-- Teacher last name-->
+        <div class="mb-3">
+            <label for="TeacherLname" class="form-label">Last Name</label>
+            <input type="text" name="TeacherLname" id="TeacherLname" class="form-control" value="@Model.TeacherLName" />
+            <div id="lname-error"></div>
+        </div>
+
+        <!-- Teacher employee number-->
+        <div class="mb-3">
+            <label for="EmployeeNumber" class="form-label">Employee Number</label>
+            <input type="text" name="EmployeeNumber" id="EmployeeNumber" class="form-control" value="@Model.EmployeeNumber" />
+            <div id="employeenumber-error"></div>
+        </div>
+
+
+        <!-- Teacher hire date-->
+        <div class="mb-3">
+            <label for="HireDate" class="form-label">Hire Date</label>
+            <input type="date" name="HireDate" id="HireDate" class="form-control" value="@DateTime.Parse(Model.HireDate).ToString("yyyy-MM-dd")" />
+            <div id="hiredate-error"></div>
+        </div>
+
+        <!-- Teacher salary-->
+        <div class="mb-3">
+            <label for="Salary" class="form-label">Salary</label>
+            <input type="number" name="Salary" id="Salary" step="0.01" class="form-control" value="@Model.Salary" />
+            <div id="salary-error"></div>
+        </div>
+
+        <!-- Submit button -->
+        <div class="text-center">
+            <input type="submit" value="Edit Teacher" class="btn btn-warning btn-lg" />
+        </div>
+    </form>
+}
+else
+{
+    <!-- Update Error Section -->
+    <h1 class="text-center text-danger">Update Failed</h1>
+    <p class="text-center">Teacher Id - @ViewData["Id"] not found. Update cannot be performed.</p>
+
+}
+
+<!-- JS Validation -->
+@*
+<script>
+
+    // Get the form elements after submit event
+    document.getElementById("teacher-form").addEventListener("submit", function (event){
+
+        // Regex pattern for employee number
+        const employeeNumberPattern = /^T\d{3}$/;
+
+        // Get elements from DOM
+        const teacherFName = document.getElementById("TeacherFname").value.trim();
+        const teacherLName = document.getElementById("TeacherLname").value.trim();
+        const employeeNumber = document.getElementById("EmployeeNumber").value.trim();
+        const hireDate = document.getElementById("HireDate").value.trim();
+        const salary = document.getElementById("Salary").value;
+
+        // Get error elements from DOM
+        var teacherFNameError = document.getElementById("fname-error");
+        var teacherLNameError = document.getElementById("lname-error");
+        var employeeNumberError = document.getElementById("employeenumber-error");
+        var hireDateError = document.getElementById("hiredate-error");
+        var salaryError = document.getElementById("salary-error");
+
+        // Assign empty value
+        teacherFNameError.innerHTML = "";
+        teacherLNameError.innerHTML = "";
+        employeeNumberError.innerHTML = "";
+        hireDateError.innerHTML = "";
+        salaryError.innerHTML = "";
+
+        // Perform validation on the field
+         if (teacherFName === "") {
+            // Prevent form submission
+            event.preventDefault();
+            teacherFNameError.innerHTML = "<p class='text-danger'>Teacher first name cannot be empty.</p>";
+        }
+        if (teacherLName === "") {
+            // Prevent form submission
+            event.preventDefault();
+            teacherLNameError.innerHTML = "<p class='text-danger'>Teacher last name cannot be empty.</p>";
+        }
+        if (employeeNumber === "") {
+            // Prevent form submission
+            event.preventDefault();
+            employeeNumberError.innerHTML = "<p class='text-danger'>Employee number cannot be empty.</p>";
+        }
+        if (employeeNumber !== "" && !employeeNumberPattern.test(employeeNumber)) {
+            // Prevent form submission
+            event.preventDefault();
+            employeeNumberError.innerHTML = "<p class='text-danger'>Employee number should start with 'T' followed by 3 digits. Eg: T123</p>";
+        }
+        if (hireDate === "") {
+            // Prevent form submission
+            event.preventDefault();
+            hireDateError.innerHTML = "<p class='text-danger'>Hire Date cannot be empty.</p>";
+        }
+        if (salary === "") {
+            // Prevent form submission
+            event.preventDefault();
+            salaryError.innerHTML = "<p class='text-danger'>Salary cannot be empty.</p>";
+        }
+        if (salary < 0) {
+            // Prevent form submission
+            event.preventDefault();
+            salaryError.innerHTML = "<p class='text-danger'>Salary cannot be less than 0.</p>";
+        }
+    })
+</script>
+*@

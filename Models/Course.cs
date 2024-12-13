@@ -15,4 +15,3 @@
         public string CourseName { get; set; }
     }
 }
-

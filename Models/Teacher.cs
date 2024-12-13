@@ -1,4 +1,6 @@
-﻿namespace Cumulative1.Models
+﻿using Cumulative1.Models;
+
+namespace Cumulative1.Models
 {
     public class Teacher
     {

@@ -1,0 +1,61 @@
+﻿@model Cumulative1.Models.Course
+
+@if (Model.CourseId > 0)
+{
+    <h2 class="text-center mb-4">Edit Course Details</h2>
+
+    <!-- Back to courses -->
+    <nav class="mb-4">
+        <a class="nav-link" href="/CoursePage/List">Back To Courses</a>
+    </nav>
+
+    <!-- Edit Course Form-->
+    <form id="course-form" method="POST" action="/CoursePage/Create" class="container shadow-lg p-5 m-4 bg-light rounded">
+        <!-- Course code-->
+        <div class="mb-3">
+            <label for="CourseCode" class="form-label">Course Code</label>
+            <input type="text" name="CourseCode" id="CourseCode" class="form-control" value="@Model.CourseCode" />
+            <div id="coursecode-error"></div>
+        </div>
+
+        <!-- Teacher id-->
+        <div class="mb-3">
+            <label for="TeacherId" class="form-label">Teacher Id</label>
+            <input type="number" name="TeacherId" id="TeacherId" class="form-control" value="@Model.TeacherId" />
+            <div id="teacherid-error"></div>
+        </div>
+
+        <!-- Course start date-->
+        <div class="mb-3">
+            <label for="StartDate" class="form-label">Start Date</label>
+            <input type="date" name="StartDate" id="StartDate" class="form-control" value="@DateTime.Parse(Model.StartDate).ToString("yyyy-MM-dd")" />
+            <div id="startdate-error"></div>
+        </div>
+
+        <!-- Course finish date-->
+        <div class="mb-3">
+            <label for="FinishDate" class="form-label">Finish Date</label>
+            <input type="date" name="FinishDate" id="FinishDate" class="form-control" value="@DateTime.Parse(Model.FinishDate).ToString("yyyy-MM-dd")" />
+            <div id="finishdate-error"></div>
+        </div>
+
+        <!-- Course name-->
+        <div class="mb-3">
+            <label for="CourseName" class="form-label">Course Name</label>
+            <input type="text" name="CourseName" id="CourseName" class="form-control" value="@Model.CourseName" />
+            <div id="coursename-error"></div>
+        </div>
+
+        <!-- Submit button -->
+        <div class="text-center">
+            <input type="submit" value="Edit Course" class="btn btn-warning btn-lg" />
+        </div>
+    </form>
+}
+else
+{
+    <!-- Update Error Section -->
+    <h1 class="text-center text-danger">Update Failed</h1>
+    <p class="text-center">Course Id - @ViewData["Id"] not found. Update cannot be performed.</p>
+}
+

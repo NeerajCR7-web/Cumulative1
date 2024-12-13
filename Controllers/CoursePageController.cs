@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Cumulative1.Controllers;
+using Cumulative1.Models;
+using Microsoft.AspNetCore.Mvc;
 using Cumulative1.Controllers;
 using Cumulative1.Models;
 
@@ -16,21 +18,14 @@ namespace Cumulative1.Controllers
             _api = api;
         }
 
-        /// <summary>
-        /// Retrieves and displays a list of all courses from the API.
-        /// </summary>
-        /// <returns>A view displaying a list of courses.</returns>
+        // GET : CoursePage/List
         public IActionResult List()
         {
             List<Course> Courses = _api.ListCourses();
             return View(Courses);
         }
 
-        /// <summary>
-        /// Retrieves and displays details of a specific course based on the given ID.
-        /// </summary>
-        /// <param name="id">The ID of the course to display.</param>
-        /// <returns>A view displaying the details of the selected course.</returns>
+        // GET : CoursePage/Show/{id}
         public IActionResult Show(int id)
         {
             Course SelectedCourse = _api.FindCourse(id);
@@ -38,23 +33,18 @@ namespace Cumulative1.Controllers
             return View(SelectedCourse);
         }
 
-        /// <summary>
-        /// Displays a form for creating a new course.
-        /// </summary>
-        /// <returns>A view containing the course creation form.</returns>
+        // GET: CoursePage/New
         [HttpGet]
         public IActionResult New()
         {
             return View();
         }
 
-        /// <summary>
-        /// Displays validation errors, if any, for the course creation process.
-        /// </summary>
-        /// <returns>A view showing validation error messages.</returns>
+        // GET: CoursePage/Validation
         [HttpGet]
         public IActionResult Validation()
         {
+
             if (TempData["ErrorMessage"] != null)
             {
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
@@ -62,62 +52,141 @@ namespace Cumulative1.Controllers
             return View();
         }
 
-        /// <summary>
-        /// Validates and processes a new course creation request.
-        /// </summary>
-        /// <param name="CourseData">The course data submitted by the user.</param>
-        /// <returns>
-        /// Redirects to the validation page if there are errors, or the course details page if creation is successful.
-        /// </returns>
+        // POST: CoursePage/Create
         [HttpPost]
         public IActionResult Create(Course CourseData)
         {
+
+            // Check for future start date
             if (!string.IsNullOrEmpty(CourseData.StartDate) && DateTime.Parse(CourseData.StartDate) > DateTime.Now)
             {
                 TempData["ErrorMessage"] = "Course start date cannot be in future.";
                 return RedirectToAction("Validation");
             }
 
+            // Check for future finish date
             if (!string.IsNullOrEmpty(CourseData.FinishDate) && DateTime.Parse(CourseData.FinishDate) > DateTime.Now)
             {
                 TempData["ErrorMessage"] = "Course finish date cannot be in future.";
                 return RedirectToAction("Validation");
             }
 
+            // Check for course name field from the input
             if (string.IsNullOrEmpty(CourseData.CourseName))
             {
-                TempData["ErrorMessage"] = "Course name cannot be empty.";
+                TempData["ErrorMessage"] = "Course name cannot be empty";
                 return RedirectToAction("Validation");
             }
 
-            int CourseId = _api.AddCourse(CourseData);
-            return RedirectToAction("Show", new { id = CourseId });
+            else
+            {
+                int CourseId = _api.AddCourse(CourseData);
+                return RedirectToAction("Show", new { id = CourseId });
+            }
+
         }
 
-        /// <summary>
-        /// Displays a confirmation page before deleting a course.
-        /// </summary>
-        /// <param name="id">The ID of the course to delete.</param>
-        /// <returns>A view asking for confirmation to delete the selected course.</returns>
+
+        // GET : CoursePage/DeleteConfirm/{id}
         [HttpGet]
         public IActionResult DeleteConfirm(int id)
         {
             Course SelectedCourse = _api.FindCourse(id);
+
             return View(SelectedCourse);
         }
 
-        /// <summary>
-        /// Deletes a course based on the provided ID.
-        /// </summary>
-        /// <param name="id">The ID of the course to delete.</param>
-        /// <returns>
-        /// Redirects to the course list view after the delete operation.
-        /// </returns>
+        // POST: StudentPage/Delete/{id}
         [HttpPost]
         public IActionResult Delete(int id)
         {
             string RowsAffected = _api.DeleteCourse(id);
+
+            // redirects to list action
             return RedirectToAction("List");
         }
+
+
+        // GET : CoursePage/Edit/{id}
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            Course SelectedCourse = _api.FindCourse(id);
+            ViewData["Id"] = id;
+            return View(SelectedCourse);
+
+        }
+
+        // POST: CoursePage/Update/{id}
+        [HttpPost]
+        public IActionResult Update(int id, string CourseCode, int TeacherId, string StartDate, string FinishDate, string CourseName)
+        {
+            Course UpdateCourse = new Course();
+
+            UpdateCourse.CourseCode = CourseCode;
+            UpdateCourse.TeacherId = TeacherId;
+            UpdateCourse.StartDate = StartDate.ToString();
+            UpdateCourse.FinishDate = FinishDate.ToString();
+            UpdateCourse.CourseName = CourseName;
+
+            // Check for start date
+            if (string.IsNullOrEmpty(UpdateCourse.StartDate))
+            {
+                TempData["ErrorMessage"] = "Course start date cannot be empty.";
+                return RedirectToAction("Validation");
+            }
+
+            // Check for future start date
+            if (!string.IsNullOrEmpty(UpdateCourse.StartDate) && DateTime.Parse(UpdateCourse.StartDate) > DateTime.Now)
+            {
+                TempData["ErrorMessage"] = "Course start date cannot be in future.";
+                return RedirectToAction("Validation");
+            }
+
+            // Check for finish date
+            if (string.IsNullOrEmpty(UpdateCourse.FinishDate))
+            {
+                TempData["ErrorMessage"] = "Course finish date cannot be empty.";
+                return RedirectToAction("Validation");
+            }
+
+            // Check for future finish date
+            if (!string.IsNullOrEmpty(UpdateCourse.FinishDate) && DateTime.Parse(UpdateCourse.FinishDate) > DateTime.Now)
+            {
+                TempData["ErrorMessage"] = "Course finish date cannot be in future.";
+                return RedirectToAction("Validation");
+            }
+
+            // Check for course name field from the input
+            if (string.IsNullOrEmpty(UpdateCourse.CourseName))
+            {
+                TempData["ErrorMessage"] = "Course name cannot be empty";
+                return RedirectToAction("Validation");
+            }
+
+            // Check for course code field from the input
+            if (string.IsNullOrEmpty(UpdateCourse.CourseCode))
+            {
+                TempData["ErrorMessage"] = "Course code cannot be empty";
+                return RedirectToAction("Validation");
+            }
+
+            // Check for teacher id field from the input
+            if (UpdateCourse.TeacherId == 0)
+            {
+                TempData["ErrorMessage"] = "Teacher Id cannot be empty";
+                return RedirectToAction("Validation");
+            }
+
+            else
+            {
+                _api.UpdateCourse(id, UpdateCourse);
+
+                // redirects to show course
+                return RedirectToAction("Show", new { id = id });
+            }
+
+        }
+
     }
 }

@@ -1,0 +1,113 @@
+﻿@model Cumulative1.Models.Student
+
+@if (Model.StudentId > 0)
+{
+
+    <h2 class="text-center mb-4">Edit Student Details</h2>
+
+    <!-- Back to students -->
+    <nav class="mb-4">
+        <a class="nav-link" href="/StudentPage/List">Back To Students</a>
+    </nav>
+
+    <!-- Edit Student Form-->
+    <form id="student-form" method="POST" action="/StudentPage/Update/@Model.StudentId" class="container shadow-lg p-5 m-4 bg-light rounded">
+        <!-- Student first name-->
+        <div class="mb-3">
+            <label for="StudentFname" class="form-label">First Name</label>
+            <input type="text" name="StudentFname" id="StudentFname" class="form-control" value="@Model.StudentFName" />
+            <div id="fname-error"></div>
+        </div>
+
+        <!-- Student last name-->
+        <div class="mb-3">
+            <label for="StudentLname" class="form-label">Last Name</label>
+            <input type="text" name="StudentLname" id="StudentLname" class="form-control" value="@Model.StudentLName" />
+            <div id="lname-error"></div>
+        </div>
+
+        <!-- Student number-->
+        <div class="mb-3">
+            <label for="StudentNumber" class="form-label">Student Number</label>
+            <input type="text" name="StudentNumber" id="StudentNumber" class="form-control" value="@Model.StudentNumber" />
+            <div id="studentnumber-error"></div>
+        </div>
+
+        <!-- Student enrol date-->
+        <div class="mb-3">
+            <label for="EnrolDate" class="form-label">Enrol Date</label>
+            <input type="date" name="EnrolDate" id="EnrolDate" class="form-control" value="@DateTime.Parse(Model.EnrolDate).ToString("yyyy-MM-dd")" />
+            <div id="enroldate-error"></div>
+        </div>
+
+        <!-- Submit button -->
+        <div class="text-center">
+            <input type="submit" value="Edit Student" class="btn btn-primary btn-lg" />
+        </div>
+    </form>
+}
+
+else
+{
+    <!-- Update Error Section -->
+    <h1 class="text-center text-danger">Update Failed</h1>
+    <p class="text-center">Student Id - @ViewData["Id"] not found. Update cannot be performed.</p>
+}
+
+<!-- JS Validation -->
+@*
+<script>
+
+    // Get the form elements after submit event
+    document.getElementById("student-form").addEventListener("submit", function (event) {
+
+        // Regex pattern for student number
+        const studentNumberPattern = /^N\d{4}$/;
+
+        // Get elements from DOM
+        const studentFName = document.getElementById("StudentFname").value.trim();
+        const studentLName = document.getElementById("StudentLname").value.trim();
+        const studentNumber = document.getElementById("StudentNumber").value.trim();
+        const enrolDate = document.getElementById("EnrolDate").value.trim();
+
+        // Get error elements from DOM
+        var studentFNameError = document.getElementById("fname-error");
+        var studentLNameError = document.getElementById("lname-error");
+        var studentNumberError = document.getElementById("studentnumber-error");
+        var enrolDateError = document.getElementById("enroldate-error");
+
+        // Assign empty value
+        studentFNameError.innerHTML = "";
+        studentLNameError.innerHTML = "";
+        studentNumberError.innerHTML = "";
+        enrolDateError.innerHTML = "";
+
+        // Perform validation on the field
+        if (studentFName === "") {
+            // Prevent form submission
+            event.preventDefault();
+            studentFNameError.innerHTML = "<p class='text-danger'>Student first name cannot be empty.</p>";
+        }
+        if (studentLName === "") {
+            // Prevent form submission
+            event.preventDefault();
+            studentLNameError.innerHTML = "<p class='text-danger'>Student last name cannot be empty.</p>";
+        }
+        if (studentNumber === "") {
+            // Prevent form submission
+            event.preventDefault();
+            studentNumberError.innerHTML = "<p class='text-danger'>Student number cannot be empty.</p>";
+        }
+        if (studentNumber !== "" && !studentNumberPattern.test(studentNumber)) {
+            // Prevent form submission
+            event.preventDefault();
+            studentNumberError.innerHTML = "<p class='text-danger'>Student number should start with 'N' followed by 4 digits. Eg: N1234</p>";
+        }
+        if (enrolDate === "") {
+            // Prevent form submission
+            event.preventDefault();
+            enrolDateError.innerHTML = "<p class='text-danger'>Enrol Date cannot be empty.</p>";
+        }
+    })
+</script>
+*@
