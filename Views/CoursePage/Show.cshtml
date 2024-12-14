@@ -1,4 +1,4 @@
-﻿﻿@model Cumulative1.Models.Course
+﻿@model Cumulative1.Models.Course
 
 <div class="container mt-5 bg-light p-5 rounded shadow-lg">
     @if (Model.CourseId > 0)
@@ -9,42 +9,42 @@
         <!-- Course Details Section -->
         <div class="row justify-content-center">
             <div class="col-md-8">
-            <!-- Card for Course Details -->
-            <div class="card shadow-sm rounded-lg border-0">
-                <div class="card-body">
-                    <!-- Section Title -->
-                    <h5 class="card-title text-center text-secondary mb-4">Course Details</h5>
+                <!-- Card for Course Details -->
+                <div class="card shadow-sm rounded-lg border-0">
+                    <div class="card-body">
+                        <!-- Section Title -->
+                        <h5 class="card-title text-center text-secondary mb-4">Course Details</h5>
 
-                    <!-- List of course details -->
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Course ID:</strong>
-                            <span>@Model.CourseId</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Course Code:</strong>
-                            <span>@Model.CourseCode</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Teacher ID:</strong>
-                            <span>@Model.TeacherId</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Start Date:</strong>
-                            <span>@Model.StartDate</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Finish Date:</strong>
-                            <span>@Model.FinishDate</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Course Name:</strong>
-                            <span>@Model.CourseName</span>
-                        </li>
-                    </ul>
+                        <!-- List of course details -->
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Course ID:</strong>
+                                <span>@Model.CourseId</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Course Code:</strong>
+                                <span>@Model.CourseCode</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Teacher ID:</strong>
+                                <span>@Model.TeacherId</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Start Date:</strong>
+                                <span>@Model.StartDate</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Finish Date:</strong>
+                                <span>@Model.FinishDate</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Course Name:</strong>
+                                <span>@Model.CourseName</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
 
         <!-- Button Section at the Bottom -->

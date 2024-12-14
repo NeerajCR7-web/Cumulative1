@@ -1,7 +1,8 @@
-﻿using Cumulative1.Models;
+﻿
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using Cumulative1.Models;
 namespace Cumulative1.Controllers
 {
     [Route("api/Course")]

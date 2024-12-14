@@ -1,7 +1,6 @@
 ﻿using Cumulative1.Controllers;
 using Cumulative1.Models;
 using Microsoft.AspNetCore.Mvc;
-using Cumulative1.Models;
 using System.Text.RegularExpressions;
 
 namespace Cumulative1.Controllers

@@ -1,6 +1,6 @@
 ﻿using Cumulative1.Models;
 
-namespace Cumulative1.Models
+namespace SchoolDatabase.Models
 {
     public class TeacherSearchModel
     {
